@@ -1,0 +1,65 @@
+services:
+
+  #RE Cluster - Node 1
+  re1:
+    image: redislabs/redis:latest
+    container_name: re1
+    restart: unless-stopped
+    tty: true
+    cap_add: 
+      - sys_resource
+    ports:
+      - "12000:12000"
+      - "13000:13000"
+      - "8443:8443"
+      - "9443:9443"
+    networks:
+      re_cluster:
+        ipv4_address: 192.168.20.2
+
+  #RE Cluster - Node 2
+  re2:
+    image: redislabs/redis:latest
+    container_name: re2
+    restart: unless-stopped
+    tty: true
+    cap_add: 
+      - sys_resource
+    networks:
+      re_cluster:
+        ipv4_address: 192.168.20.3
+
+  #RE Cluster - Node 3
+  re3:
+    image: redislabs/redis:latest
+    container_name: re3
+    restart: unless-stopped
+    tty: true
+    cap_add: 
+      - sys_resource
+    networks:
+      re_cluster:
+        ipv4_address: 192.168.20.4
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    command: [ "postgres", "-c", "wal_level=logical" ]
+    networks:
+      re_cluster:
+        ipv4_address: 192.168.20.5
+
+#Docker Networks
+networks:
+  re_cluster:
+    name: re_network
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.20.0/24
