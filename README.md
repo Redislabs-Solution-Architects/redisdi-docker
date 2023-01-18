@@ -7,8 +7,7 @@
 4.  [Installation](#installation)
 5.  [Results](#results)
     1.  [Architecture](#architecture)
-    2.  [rladmin](#rladmin)
-    3.  [RedisInsight](#redisinsight)
+
 
 ## Summary <a name="summary"></a>
 This is a utility script for building a full Redis DI environment in Docker
