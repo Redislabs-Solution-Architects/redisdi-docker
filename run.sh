@@ -1,12 +1,8 @@
 #!/bin/bash
 # Maker: Joey Whelan
 # Usage: run.sh
-# Description:  Starts a 3-node Redis Enterpise cluster + postgresql containers,
-# builds a Redis target DB, 
-# builds a Postgres source DB, 
-# builds a Redis DI sink DB,
-# deploys Redis DI
-# starts a Debezium container
+# Description:  Starts a 3-node Redis Enterpise cluster + postgresql containers, builds a Redis target DB, 
+# builds a source DB, builds a Redis DI sink DB, deploys Redis DI, starts a Debezium container
 
 GEARS=redisgears_python.Linux-ubuntu18.04-x86_64.1.2.5.zip
 JSON=rejson.Linux-ubuntu18.04-x86_64.2.4.3.zip
