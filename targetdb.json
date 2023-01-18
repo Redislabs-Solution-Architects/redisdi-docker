@@ -5,19 +5,14 @@
     "port": 12000,
     "proxy_policy": "all-nodes",
     "sharding": true,
-    "shards_count": 2,
+    "shards_count": 1,
     "shards_placement": "sparse",
     "shard_key_regex": [{"regex": ".*\\{(?<tag>.*)\\}.*"}, {"regex": "(?<tag>.*)"}],
     "replication": false,
     "authentication_redis_pass": "redis",
     "module_list": [{
-        "module_name": "search",
-        "module_args": "",
-        "semantic_version": "2.6.3"
-    },
-    {
         "module_name":"ReJSON",
         "module_args": "",
-        "semantic_version": "2.4.2"
+        "semantic_version": "2.4.3"
     }]
 }

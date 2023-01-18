@@ -8,21 +8,48 @@
 # deploys Redis DI
 # starts a Debezium container
 
-SEARCH=redisearch.Linux-ubuntu18.04-x86_64.2.6.3.zip
-JSON=rejson.Linux-ubuntu18.04-x86_64.2.4.2.zip
 GEARS=redisgears_python.Linux-ubuntu18.04-x86_64.1.2.5.zip
-CHINOOK=chinook.sql
-REDIS_DI=redis-di
+JSON=rejson.Linux-ubuntu18.04-x86_64.2.4.3.zip
+SOURCE_DB=
 
 gears_check() {
-    curl -s -k -u "redis@redis.com:redis" https://localhost:9443/v1/modules | jq '.[] | select(.display_name=="RedisGears").semantic_version'
+    while [ -z "$(curl -s -k -u "redis@redis.com:redis" https://localhost:9443/v1/modules | \
+    jq '.[] | select(.display_name=="RedisGears").semantic_version')" ]
+    do  
+        sleep 3
+    done
 }
 
-if [ ! -f $SEARCH ]
-then
-    echo "*** Fetch Search module  ***"
-    wget -q https://redismodules.s3.amazonaws.com/redisearch/$SEARCH
-fi 
+db_check() {
+    case $SOURCE_DB in
+        postgres)
+        while ! pg_isready -q -h 127.0.0.1
+        do  
+            sleep 3
+        done
+        echo "*** Postgres is up ***"
+        ;;
+        mysql)
+        while ! mysqladmin -s -h 127.0.0.1 ping
+        do      
+            sleep 3
+        done
+        echo "*** Mysql is up ***"
+        docker exec mysql mysql --user=root --password=debezium --silent \
+        -e "GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'mysqluser';" >/dev/null 2>&1
+        ;;
+    esac
+}
+
+case $1 in
+    postgres|mysql) 
+        SOURCE_DB=$1
+        ;;
+    *)  
+        echo "Usage: run.sh <db type: postgres|mysql>" 1>&2
+        exit 1
+        ;;
+esac
 
 if [ ! -f $JSON ]
 then
@@ -32,24 +59,18 @@ fi
 
 if [ ! -f $GEARS ]
 then
-    echo "*** Fetch Gears module  ***"
-    wget -q https://redismodules.s3.amazonaws.com/redisgears/$GEARS
-fi 
-
-if [ ! -f $CHINOOK ]
-then
-    echo "*** Fetch Chinook script ***"
-    wget -q https://raw.githubusercontent.com/xivSolutions/ChinookDb_Pg_Modified/master/chinook_pg_serial_pk_proper_naming.sql -O chinook.sql
+    echo "*** Fetch Gears  ***"
+    wget -q https://redismodules.s3.amazonaws.com/redisgears/$GEARS 
 fi
 
-if [ ! -f $REDIS_DI ]
+if [ ! -f redis-di ]
 then
     echo "*** Fetch redis-di executable ***"
     wget -q https://qa-onprem.s3.amazonaws.com/redis-di/latest/redis-di-ubuntu20.04-latest.tar.gz -O - | tar -xz
 fi
 
-echo "*** Launch Redis Enterprise + Postgres Containers ***"
-docker compose up -d
+echo "*** Launch Redis Enterprise + Source DB Containers ***"
+docker compose --profile $SOURCE_DB up -d
 
 echo "*** Wait for Redis Enterprise to come up ***"
 curl -s -o /dev/null --retry 5 --retry-all-errors --retry-delay 3 -f -k -u "redis@redis.com:redis" https://localhost:9443/v1/bootstrap
@@ -61,20 +82,13 @@ docker exec -it re3 /opt/redislabs/bin/rladmin cluster join nodes 192.168.20.2 u
 
 echo "*** Load Modules ***"
 curl -s -o /dev/null -k -u "redis@redis.com:redis" https://localhost:9443/v2/modules -F module=@$GEARS
-curl -s -o /dev/null -k -u "redis@redis.com:redis" https://localhost:9443/v1/modules -F module=@$SEARCH
 curl -s -o /dev/null -k -u "redis@redis.com:redis" https://localhost:9443/v1/modules -F module=@$JSON
 
 echo "*** Build Target Redis DB ***"
 curl -s -o /dev/null -k -u "redis@redis.com:redis" https://localhost:9443/v1/bdbs -H "Content-Type:application/json" -d @targetdb.json
 
-echo "*** Build Source Postgres DB ***"
-export PGPASSWORD=postgres; createdb -U postgres -h localhost chinook; psql -q chinook -U postgres -h localhost -1 -f ./chinook.sql >&/dev/null
-
 echo "*** Wait for Gears Module to load ***"
-while [ -z "$(gears_check)" ] 
-do 
-    sleep 3
-done
+gears_check
 
 echo "*** Build Redis DI DB ***"
 ./redis-di create --silent --cluster-host localhost --cluster-api-port 9443 --cluster-user redis@redis.com \
@@ -86,5 +100,8 @@ docker exec -it re1 /opt/redislabs/bin/rladmin bind db redis-di-1 endpoint 2:1 p
 echo "*** Deploy Redis DI ***"
 ./redis-di deploy --dir ./conf --rdi-host localhost --rdi-port 13000 --rdi-password redis
 
+echo "*** Wait for Source DB to come up ***"
+db_check
+
 echo "*** Start Debezium ***"
-docker run -d --rm --name debezium --network re_network --privileged -v $PWD/conf/debezium:/debezium/conf debezium/server:2.0.0.Final
+docker run -d --rm --name debezium --network re_network --privileged -v $PWD/conf/debezium/$SOURCE_DB:/debezium/conf debezium/server:2.0.0.Final
