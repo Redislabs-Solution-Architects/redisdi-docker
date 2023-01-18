@@ -42,17 +42,32 @@ services:
         ipv4_address: 192.168.20.4
 
   postgres:
-    image: postgres:latest
+    image: debezium/example-postgres:latest
     container_name: postgres
     environment:
-      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
-    command: [ "postgres", "-c", "wal_level=logical" ]
+    profiles: ["postgres"]
     networks:
       re_cluster:
         ipv4_address: 192.168.20.5
+  
+  mysql:
+    image: debezium/example-mysql:latest
+    restart: on-failure
+    container_name: mysql
+    ports:
+     - 3306:3306
+    environment:
+     - MYSQL_ROOT_PASSWORD=debezium
+     - MYSQL_USER=mysqluser
+     - MYSQL_PASSWORD=mysqlpw
+    profiles: ["mysql"]
+    networks:
+      re_cluster:
+        ipv4_address: 192.168.20.8
 
 #Docker Networks
 networks:
