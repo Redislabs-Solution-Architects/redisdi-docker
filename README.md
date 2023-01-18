@@ -14,11 +14,11 @@
 This is a utility script for building a full Redis DI environment in Docker
 
 ## Features <a name="features"></a>
-- Builds out a full Redis DI environment to include:  Redis Cluster, Postgresql, Redis DI, Debezium
+- Builds out a full Redis DI environment to include:  Redis Cluster, Source DB, Redis DI, Debezium
 
 ## Prerequisites <a name="prerequisites"></a>
 - Docker
-- Command line tools: curl, wget, jq, select
+- Command line tools: curl, wget, jq, select, pg_isready, mysqladmin
 
 ## Installation <a name="installation"></a>
 1. Clone this repo.
