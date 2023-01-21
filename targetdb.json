@@ -3,7 +3,7 @@
     "type": "redis",
     "memory_size":  100000000,
     "port": 12000,
-    "proxy_policy": "all-nodes",
+    "proxy_policy": "single",
     "sharding": true,
     "shards_count": 1,
     "shards_placement": "sparse",

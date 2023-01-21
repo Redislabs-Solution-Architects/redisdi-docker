@@ -10,7 +10,6 @@ services:
       - sys_resource
     ports:
       - "12000:12000"
-      - "13000:13000"
       - "8443:8443"
       - "9443:9443"
     networks:
@@ -25,6 +24,8 @@ services:
     tty: true
     cap_add: 
       - sys_resource
+    ports:
+      - "13000:13000"
     networks:
       re_cluster:
         ipv4_address: 192.168.20.3
@@ -42,32 +43,56 @@ services:
         ipv4_address: 192.168.20.4
 
   postgres:
-    image: debezium/example-postgres:latest
+    image: postgres:latest
     container_name: postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
+    volumes:
+      - $PWD/conf/debezium/postgres/scripts:/home/scripts
+    command: [ "postgres", "-c", "wal_level=logical" ]
     profiles: ["postgres"]
     networks:
       re_cluster:
         ipv4_address: 192.168.20.5
   
   mysql:
-    image: debezium/example-mysql:latest
+    image: mysql:latest
     restart: on-failure
     container_name: mysql
     ports:
      - 3306:3306
+    volumes:
+      - $PWD/conf/debezium/mysql/conf.d:/etc/mysql/conf.d
+      - $PWD/conf/debezium/mysql/scripts:/home/scripts
     environment:
      - MYSQL_ROOT_PASSWORD=debezium
+     - MYSQL_DATABASE=Chinook
      - MYSQL_USER=mysqluser
      - MYSQL_PASSWORD=mysqlpw
     profiles: ["mysql"]
     networks:
       re_cluster:
-        ipv4_address: 192.168.20.8
+        ipv4_address: 192.168.20.6
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    ports:
+     - 1433:1433
+    environment:
+     - ACCEPT_EULA=Y
+     - MSSQL_PID=Standard
+     - SA_PASSWORD=Password!
+     - MSSQL_AGENT_ENABLED=true
+    volumes:
+      - $PWD/conf/debezium/sqlserver/scripts:/home/scripts
+    profiles: ["sqlserver"]
+    networks:
+      re_cluster:
+        ipv4_address: 192.168.20.7
 
 #Docker Networks
 networks:

@@ -19,30 +19,44 @@ gears_check() {
 db_check() {
     case $SOURCE_DB in
         postgres)
-        while ! pg_isready -q -h 127.0.0.1
+        while ! docker exec postgres pg_isready | grep -q accepting
         do  
             sleep 3
         done
         echo "*** Postgres is up ***"
+        docker exec postgres /bin/bash -c "export PGPASSWORD=postgres"
+        docker exec postgres createdb -U postgres Chinook
+        docker exec postgres psql -q Chinook -U postgres -1 -f /home/scripts/chinook.sql >/dev/null 2>&1
         ;;
         mysql)
-        while ! mysqladmin -s -h 127.0.0.1 ping
+        while ! docker exec mysql mysqladmin -s --user=root --password=debezium ping 2>&1 | grep -q alive
         do      
             sleep 3
         done
-        echo "*** Mysql is up ***"
+        echo "*** MySQL is up ***"
         docker exec mysql mysql --user=root --password=debezium --silent \
         -e "GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'mysqluser';" >/dev/null 2>&1
+        docker exec mysql /bin/bash -c "mysql --user=mysqluser --password=mysqlpw Chinook < /home/scripts/chinook.sql" >/dev/null 2>&1
+        ;;
+        sqlserver)
+        while ! docker exec sqlserver cat /var/opt/mssql/log/errorlog | \
+        grep -q "ready for client connections"
+        do
+            sleep 3
+        done
+        echo "*** SQLServer is up ***"
+        docker exec sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Password! \
+        -i /home/scripts/chinook.sql 1>/dev/null
         ;;
     esac
 }
 
 case $1 in
-    postgres|mysql) 
+    postgres|mysql|sqlserver) 
         SOURCE_DB=$1
         ;;
     *)  
-        echo "Usage: run.sh <db type: postgres|mysql>" 1>&2
+        echo "Usage: run.sh <db type: postgres|mysql|sqlserver>" 1>&2
         exit 1
         ;;
 esac
@@ -89,9 +103,6 @@ gears_check
 echo "*** Build Redis DI DB ***"
 ./redis-di create --silent --cluster-host localhost --cluster-api-port 9443 --cluster-user redis@redis.com \
 --cluster-password redis --rdi-port 13000 --rdi-password redis
-
-echo "*** Expose RDI Endpoint on all nodes ***"
-docker exec -it re1 /opt/redislabs/bin/rladmin bind db redis-di-1 endpoint 2:1 policy all-nodes
 
 echo "*** Deploy Redis DI ***"
 ./redis-di deploy --dir ./conf --rdi-host localhost --rdi-port 13000 --rdi-password redis
