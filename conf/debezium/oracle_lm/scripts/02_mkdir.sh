@@ -1,0 +1,1 @@
+mkdir /opt/oracle/oradata/recovery_area
