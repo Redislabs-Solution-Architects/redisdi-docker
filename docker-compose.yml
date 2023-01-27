@@ -12,6 +12,7 @@ services:
       - "12000:12000"
       - "8443:8443"
       - "9443:9443"
+    profiles: ["mysql", "postgres", "sqlserver", "oracle_lm", "oracle_xs"]
     networks:
       re_cluster:
         ipv4_address: 192.168.20.2
@@ -26,6 +27,7 @@ services:
       - sys_resource
     ports:
       - "13000:13000"
+    profiles: ["mysql", "postgres", "sqlserver", "oracle_lm", "oracle_xs"]
     networks:
       re_cluster:
         ipv4_address: 192.168.20.3
@@ -38,6 +40,7 @@ services:
     tty: true
     cap_add: 
       - sys_resource
+    profiles: ["mysql", "postgres", "sqlserver", "oracle_lm", "oracle_xs"]
     networks:
       re_cluster:
         ipv4_address: 192.168.20.4
@@ -93,6 +96,60 @@ services:
     networks:
       re_cluster:
         ipv4_address: 192.168.20.7
+
+  oracle_lm:
+    image: container-registry.oracle.com/database/enterprise:latest
+    container_name: oracle_lm
+    ports:
+     - 1521:1521
+    environment:
+     - ORACLE_SID=ORCLCDB 
+     - ORACLE_EDITION=enterprise
+     - ORACLE_PWD=Password1
+     - INIT_SGA_SIZE=1024
+     - INIT_PGA_SIZE=1024
+    volumes:
+      - $PWD/conf/debezium/oracle_lm/scripts:/opt/oracle/scripts/startup
+    profiles: ["oracle_lm"]
+    networks:
+      re_cluster:
+        ipv4_address: 192.168.20.8
+
+  oracle_xs:
+    image: container-registry.oracle.com/database/enterprise:latest
+    container_name: oracle_xs
+    ports:
+     - 1521:1521
+    environment:
+     - ORACLE_SID=ORCLCDB 
+     - ORACLE_EDITION=enterprise
+     - ORACLE_PWD=Password1
+     - INIT_SGA_SIZE=1024
+     - INIT_PGA_SIZE=1024
+    volumes:
+      - $PWD/conf/debezium/oracle_xs/scripts:/opt/oracle/scripts/startup
+    profiles: ["oracle_xs"]
+    networks:
+      re_cluster:
+        ipv4_address: 192.168.20.9
+
+  debezium:
+    build: 
+      context: $PWD/conf/debezium
+      args:
+        INSTANT_CLIENT: $INSTANT_CLIENT 
+    container_name: debezium
+    volumes:
+      - $PWD/conf/debezium/$SOURCE_DB/application.properties:/debezium/conf/application.properties
+#      - /opt/oracle/instantclient_21_9:/debezium/instantclient
+#      - /opt/oracle/instantclient_21_9/ojdbc8.jar:/debezium/lib/ojdbc8.jar
+#      - /opt/oracle/instantclient_21_9/xstreams.jar:/debezium/lib/xstreams.jar
+#    environment:
+#      - LD_LIBRARY_PATH=/debezium/instantclient
+    profiles: ["debezium"]
+    networks:
+      re_cluster:
+        ipv4_address: 192.168.20.20
 
 #Docker Networks
 networks:

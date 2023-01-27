@@ -23854,3 +23854,4 @@ EXECUTE PROCEDURE "last_updated"();
 -- ----------------------------
 ALTER TABLE "film_actor" ADD PRIMARY KEY ("actor_id", "film_id");
 
+ALTER TABLE "film_category" ADD PRIMARY KEY ("category_id", "film_id");

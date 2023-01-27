@@ -5,7 +5,8 @@
 2.  [Features](#features)
 3.  [Prerequisites](#prerequisites)
 4.  [Installation](#installation)
-5.  [Architecture](#architecture)
+5.  [Usage](#usage)
+6.  [Architecture](#architecture)
 
 
 ## Summary <a name="summary"></a>
@@ -20,19 +21,19 @@ This is a utility script for building a full Redis DI environment in Docker
 
 ## Installation <a name="installation"></a>
 ```bash
-git clone https://github.com/Redislabs-Solution-Architects/redisdi-docker.git
-cd redis-di-docker
+git clone https://github.com/Redislabs-Solution-Architects/redisdi-docker.git && cd redis-di-docker
 ```
 
-## Usage
+## Usage <a name="usage"></a>
 ### Options
-- <dbtype>  postgres, mysql, and sqlserver currently supported.
+- <dbtype>  postgres, mysql, sqlserver, oracle_lm (LogMiner), oracle_xs (XStreams) currently supported.
 
 ### Execution Example
 ```bash
 ./run.sh mysql
-./run.sh postgres
-./run.sh sqlserver
+```
+```bash
+./stop.sh mysql
 ```
 
 ## Architecture <a name="architecture"></a>

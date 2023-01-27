@@ -6,6 +6,7 @@
 
 GEARS=redisgears_python.Linux-ubuntu18.04-x86_64.1.2.5.zip
 JSON=rejson.Linux-ubuntu18.04-x86_64.2.4.3.zip
+INSTANT_CLIENT=https://download.oracle.com/otn_software/linux/instantclient/219000/instantclient-basiclite-linux.x64-21.9.0.0.0dbru.zip
 SOURCE_DB=
 
 gears_check() {
@@ -48,15 +49,29 @@ db_check() {
         docker exec sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Password! \
         -i /home/scripts/chinook.sql 1>/dev/null
         ;;
+        oracle_lm)
+        while ! docker logs --tail 100 oracle_lm | grep -q "tail of the alert.log"
+        do
+            sleep 10
+        done
+        echo "*** Oracle w/LogMiner is up ***"
+        ;;
+        oracle_xs)
+        while ! docker logs --tail 100 oracle_xs | grep -q "tail of the alert.log"
+        do
+            sleep 10
+        done
+        echo "*** Oracle w/XStreams is up ***"
+        ;;
     esac
 }
 
 case $1 in
-    postgres|mysql|sqlserver) 
+    postgres|mysql|sqlserver|oracle_lm|oracle_xs) 
         SOURCE_DB=$1
         ;;
     *)  
-        echo "Usage: run.sh <db type: postgres|mysql|sqlserver>" 1>&2
+        echo "Usage: run.sh <db type: postgres|mysql|sqlserver|oracle_lm|oracle_xs>" 1>&2
         exit 1
         ;;
 esac
@@ -80,7 +95,7 @@ then
 fi
 
 echo "*** Launch Redis Enterprise + Source DB Containers ***"
-docker compose --profile $SOURCE_DB up -d
+SOURCE_DB=$SOURCE_DB INSTANT_CLIENT=$INSTANT_CLIENT docker compose --profile $SOURCE_DB up -d
 
 echo "*** Wait for Redis Enterprise to come up ***"
 curl -s -o /dev/null --retry 5 --retry-all-errors --retry-delay 3 -f -k -u "redis@redis.com:redis" https://localhost:9443/v1/bootstrap
@@ -111,4 +126,4 @@ echo "*** Wait for Source DB to come up ***"
 db_check
 
 echo "*** Start Debezium ***"
-docker run -d --rm --name debezium --network re_network --privileged -v $PWD/conf/debezium/$SOURCE_DB:/debezium/conf debezium/server:2.0.0.Final
+SOURCE_DB=$SOURCE_DB INSTANT_CLIENT=$INSTANT_CLIENT docker compose --profile debezium up -d
