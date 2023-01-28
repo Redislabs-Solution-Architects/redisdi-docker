@@ -141,11 +141,6 @@ services:
     container_name: debezium
     volumes:
       - $PWD/conf/debezium/$SOURCE_DB/application.properties:/debezium/conf/application.properties
-#      - /opt/oracle/instantclient_21_9:/debezium/instantclient
-#      - /opt/oracle/instantclient_21_9/ojdbc8.jar:/debezium/lib/ojdbc8.jar
-#      - /opt/oracle/instantclient_21_9/xstreams.jar:/debezium/lib/xstreams.jar
-#    environment:
-#      - LD_LIBRARY_PATH=/debezium/instantclient
     profiles: ["debezium"]
     networks:
       re_cluster:
