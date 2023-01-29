@@ -49,19 +49,12 @@ db_check() {
         docker exec sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Password! \
         -i /home/scripts/chinook.sql 1>/dev/null
         ;;
-        oracle_lm)
+        oracle_lm|oracle_xs)
         while ! docker logs --tail 100 oracle_lm | grep -q "tail of the alert.log"
         do
             sleep 10
         done
-        echo "*** Oracle w/LogMiner is up ***"
-        ;;
-        oracle_xs)
-        while ! docker logs --tail 100 oracle_xs | grep -q "tail of the alert.log"
-        do
-            sleep 10
-        done
-        echo "*** Oracle w/XStreams is up ***"
+        echo "*** Oracle is up ***"
         ;;
     esac
 }
