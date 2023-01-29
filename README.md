@@ -21,7 +21,7 @@ This is a utility script for building a full Redis DI environment in Docker
 
 ## Installation <a name="installation"></a>
 ```bash
-git clone https://github.com/Redislabs-Solution-Architects/redisdi-docker.git && cd redis-di-docker
+git clone https://github.com/Redislabs-Solution-Architects/redisdi-docker.git && cd redisdi-docker
 ```
 
 ## Usage <a name="usage"></a>
