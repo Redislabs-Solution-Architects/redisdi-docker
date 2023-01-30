@@ -50,7 +50,7 @@ db_check() {
         -i /home/scripts/chinook.sql 1>/dev/null
         ;;
         oracle_lm|oracle_xs)
-        while ! docker logs --tail 100 oracle_lm | grep -q "tail of the alert.log"
+        while ! docker logs --tail 100 $SOURCE_DB | grep -q "tail of the alert.log"
         do
             sleep 10
         done
