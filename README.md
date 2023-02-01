@@ -16,6 +16,7 @@ This is a utility script for building a full Redis DI environment in Docker
 - Builds out a full Redis DI environment to include:  Redis Cluster, Source DB, Redis DI, Debezium
 
 ## Prerequisites <a name="prerequisites"></a>
+- Ubuntu 20.x or higher
 - Docker
 - Command line tools: curl, wget, jq, select
 
