@@ -1,0 +1,7 @@
+source:
+  table: INVOICE
+transform:
+  - uses: filter
+    with:
+      language: sql
+      expression: TOTAL>1.75

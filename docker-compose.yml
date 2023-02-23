@@ -54,7 +54,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - $PWD/conf/debezium/postgres/scripts:/home/scripts
+      - $PWD/conf/postgres/scripts:/home/scripts
     command: [ "postgres", "-c", "wal_level=logical" ]
     profiles: ["postgres"]
     networks:
@@ -68,8 +68,8 @@ services:
     ports:
      - 3306:3306
     volumes:
-      - $PWD/conf/debezium/mysql/conf.d:/etc/mysql/conf.d
-      - $PWD/conf/debezium/mysql/scripts:/home/scripts
+      - $PWD/conf/mysql/conf.d:/etc/mysql/conf.d
+      - $PWD/conf/mysql/scripts:/home/scripts
     environment:
      - MYSQL_ROOT_PASSWORD=debezium
      - MYSQL_DATABASE=Chinook
@@ -91,7 +91,7 @@ services:
      - SA_PASSWORD=Password!
      - MSSQL_AGENT_ENABLED=true
     volumes:
-      - $PWD/conf/debezium/sqlserver/scripts:/home/scripts
+      - $PWD/conf/sqlserver/scripts:/home/scripts
     profiles: ["sqlserver"]
     networks:
       re_cluster:
@@ -109,7 +109,7 @@ services:
      - INIT_SGA_SIZE=1024
      - INIT_PGA_SIZE=1024
     volumes:
-      - $PWD/conf/debezium/oracle_lm/scripts:/opt/oracle/scripts/startup
+      - $PWD/conf/oracle_lm/scripts:/opt/oracle/scripts/startup
     profiles: ["oracle_lm"]
     networks:
       re_cluster:
@@ -127,7 +127,7 @@ services:
      - INIT_SGA_SIZE=1024
      - INIT_PGA_SIZE=1024
     volumes:
-      - $PWD/conf/debezium/oracle_xs/scripts:/opt/oracle/scripts/startup
+      - $PWD/conf/oracle_xs/scripts:/opt/oracle/scripts/startup
     profiles: ["oracle_xs"]
     networks:
       re_cluster:
@@ -140,7 +140,7 @@ services:
         INSTANT_CLIENT: $INSTANT_CLIENT 
     container_name: debezium
     volumes:
-      - $PWD/conf/debezium/$SOURCE_DB/application.properties:/debezium/conf/application.properties
+      - $PWD/conf/$SOURCE_DB/application.properties:/debezium/conf/application.properties
     profiles: ["debezium"]
     networks:
       re_cluster:
