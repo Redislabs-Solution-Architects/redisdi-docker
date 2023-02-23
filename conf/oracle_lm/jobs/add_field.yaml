@@ -1,0 +1,8 @@
+source:
+  table: ALBUM
+transform:
+  - uses: add_field
+    with:
+      field: TITLEHASH
+      language: jmespath
+      expression: hash(TITLE, 'sha256')

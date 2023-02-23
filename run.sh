@@ -113,7 +113,7 @@ echo "*** Build Redis DI DB ***"
 --cluster-password redis --rdi-port 13000 --rdi-password redis
 
 echo "*** Deploy Redis DI ***"
-./redis-di deploy --dir ./conf --rdi-host localhost --rdi-port 13000 --rdi-password redis
+./redis-di deploy --dir ./conf/$SOURCE_DB --rdi-host localhost --rdi-port 13000 --rdi-password redis
 
 echo "*** Wait for Source DB to come up ***"
 db_check

@@ -1,0 +1,7 @@
+source:
+  table: employee
+transform:
+  - uses: rename_field
+    with:
+      from_field: first_name
+      to_field: fname
