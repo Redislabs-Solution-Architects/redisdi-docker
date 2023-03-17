@@ -2,7 +2,8 @@
 
 2.  Review add_field.yaml tranformation job in detail.
 
-3.  Review initial hydration results in RedisInsight.
+3.  Review initial hydration results in RDI status + RedisInsight.
+./redis-di status --rdi-host localhost --rdi-port 13000 --rdi-password redis
 
 4.  Review an Album JSON doc in RedisInsight.
 
