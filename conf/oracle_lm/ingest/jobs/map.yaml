@@ -1,0 +1,25 @@
+source:
+  table: CUSTOMER
+transform:
+  - uses: map
+    with:
+      expression: |
+        {
+          "CustomerId": CUSTOMERID,
+          "FirstName": FIRSTNAME,
+          "LastName": LASTNAME,
+          "Company": COMPANY,
+          "Location":
+          {
+            "Street": ADDRESS,
+            "City": CITY,
+            "State": STATE,
+            "Country": COUNTRY,
+            "PostalCode": POSTALCODE
+          },
+          "Phone": PHONE,
+          "Fax": FAX,
+          "Email": EMAIL,
+          "SupportRepId": SUPPORTREPID
+        }
+      language: jmespath

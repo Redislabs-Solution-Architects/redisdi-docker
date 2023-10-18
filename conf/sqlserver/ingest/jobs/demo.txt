@@ -34,3 +34,19 @@ DELETE FROM Album Where AlbumId = 999;
 Go
 
 13. Show CDC delete in Redis with RedisInsight.
+
+
+Write-behind Demo
+
+1.  Show Empty SQL Table
+Use AccountDB;
+Go
+Select * from Account;
+Go
+
+2.  Load Value into Redis:
+JSON.SET account:20 $ '{"CustomerId": 20, "FirstName": "Dan", "LastName": "Miller", "Address": "541 Del Medio Avenue", "City": "Mountain View", "State": "CA", "Country": "USA", "PostalCode": "94040-111"}'
+
+3.  Show value was written to SQL Table
+Select * from Account;
+Go

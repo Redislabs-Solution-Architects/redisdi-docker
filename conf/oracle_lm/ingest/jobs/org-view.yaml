@@ -1,0 +1,41 @@
+source:
+  table: EPD_ORG_VIEW
+transform:
+  - uses: add_field
+    with:
+      field: coords
+      language: jmespath
+      expression: concat([GEO_Y, ', ', GEO_X])
+  - uses: map
+    with:
+      expression: |
+        {
+          "org_id": ORG_ID,
+          "co_cd": CO_CD,
+          "org_name": ORG_NAME,
+          "email_addr": EMAIL_ADDR,
+          "org_user_id": ORG_USER_ID,
+          "first_name": FIRST_NAME,
+          "last_name": LAST_NAME,
+          "rm_attribs_id": RM_ATTRIBS_ID,
+          "active": ACTIVE,
+          "in_network": IN_NETWORK,
+          "location":
+          {
+            "org_add_id": ORG_ADD_ID
+            "addr_line1": ADDR_LINE1
+            "city": CITY
+            "postal_cd": POSTAL_CD
+            "coords": coords
+          }
+        }
+      language: jmespath
+output:
+  - uses: redis.write
+    with:
+      connection: target
+      data_type: json
+      key:
+        expression: concat(['EPD_ORG:ORG_ID', ':', org_id])
+        language: jmespath
+      on_update: merge

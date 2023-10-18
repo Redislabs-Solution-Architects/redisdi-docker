@@ -1,0 +1,15 @@
+source:
+  table: album
+transform:
+  - uses: add_field
+    with:
+      field: titlehashed
+      language: jmespath
+      expression: hash(title, 'sha256')
+output:
+  - uses: redis.write
+    with:
+      connection: target
+      key:
+        expression: concat(['albumID', ':', album_id])
+        language: jmespath

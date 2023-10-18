@@ -33,6 +33,8 @@ CONNECT chinook/Password1@orclpdb1;
 /*******************************************************************************
    Create Tables
 ********************************************************************************/
+
+
 CREATE TABLE Album
 (
     AlbumId INT NOT NULL,
@@ -161,6 +163,8 @@ CREATE TABLE Track
 /*******************************************************************************
    Create Foreign Keys
 ********************************************************************************/
+
+
 ALTER TABLE Album ADD CONSTRAINT FK_AlbumArtistId
     FOREIGN KEY (ArtistId) REFERENCES Artist (ArtistId)  ;
 
@@ -198,6 +202,8 @@ ALTER TABLE Track ADD CONSTRAINT FK_TrackMediaTypeId
 /*******************************************************************************
    Populate Tables
 ********************************************************************************/
+
+
 INSERT INTO Genre (GenreId, Name) VALUES (1, 'Rock');
 INSERT INTO Genre (GenreId, Name) VALUES (2, 'Jazz');
 INSERT INTO Genre (GenreId, Name) VALUES (3, 'Metal');

@@ -1,0 +1,21 @@
+source:
+  redis:
+    key_pattern: account:*
+    trigger: write-behind
+    exclude_commands: ["json.del"]
+output:
+  - uses: relational.write
+    with:
+      connection: my-oracle
+      schema: accountdb
+      table: account
+      keys:
+        - id
+      mapping:
+        - firstname
+        - lastname
+        - address
+        - city
+        - state
+        - country
+        - postalcode

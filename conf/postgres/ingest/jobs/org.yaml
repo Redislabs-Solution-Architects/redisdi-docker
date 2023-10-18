@@ -1,0 +1,32 @@
+source:
+  table: org
+transform:
+  - uses: add_field
+    with:
+      field: coords
+      language: jmespath
+      expression: concat([geo_y, ', ', geo_x])
+  - uses: map
+    with:
+      expression: |
+        {
+          "org_id": org_id,
+          "co_cd": co_cd,
+          "org_name": org_name,
+          "email_addr": email_addr,
+          "org_user_id": org_user_id,
+          "first_name": first_name,
+          "last_name": last_name,
+          "rm_attribs_id": rm_attribs_id,
+          "active": active,
+          "in_network": in_network,
+          "location":
+          {
+            "org_add_id": org_add_id,
+            "addr_line1": addr_line1,
+            "city": city,
+            "postal_cd": postal_cd,
+            "coords": coords
+          }
+        }
+      language: jmespath

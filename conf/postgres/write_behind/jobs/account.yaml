@@ -1,0 +1,21 @@
+source:
+  redis:
+    key_pattern: account:*
+    trigger: write-behind
+    exclude_commands: ["json.del"]
+output:
+  - uses: relational.write
+    with:
+      connection: psql
+      schema: public
+      table: account
+      keys:
+        - customer_id
+      mapping:
+        - first_name
+        - last_name
+        - address
+        - city
+        - state
+        - country
+        - postal_code

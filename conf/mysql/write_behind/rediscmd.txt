@@ -1,0 +1,4 @@
+json.set account:1 $ '{"CustomerId":1, "FirstName": "John", "LastName": "Smith", "Address": "123 Smith St", "City":"Columbia", "State":"MO","Country":"USA","PostalCode":"65202"}'
+
+mysql -u mysqluser --password=mysqlpw AccountDB
+select * from Account;

@@ -1,0 +1,6 @@
+
+json.set account:1 $ '{"CustomerId":1, "FirstName": "John", "LastName": "Smith", "Address": "123 Smith St", "City":"Columbia", "State":"MO","Country":"USA","PostalCode":"65202"}'
+
+/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Password! -d AccountDB
+select * from Account;
+go
