@@ -1,0 +1,24 @@
+source:
+  table: EPD_RM_ATTRIBS
+transform:
+  - uses: map
+    with:
+      expression: |
+        {
+          "org_id": ORG_ID
+          "rm_attribs":
+          {
+            "is_active": IS_ACTIVE,
+            "in_network": IN_NETWORK
+          }
+        }        
+      language: jmespath 
+output:
+  - uses: redis.write
+    with:
+      connection: target
+      data_type: json
+      key:
+        expression: concat(['EPD_ORG:ORG_ID', ':', org_id])
+        language: jmespath      
+      on_update: merge

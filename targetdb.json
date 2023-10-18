@@ -1,7 +1,7 @@
 {
     "name": "targetdb",
     "type": "redis",
-    "memory_size":  100000000,
+    "memory_size":  1000000000,
     "port": 12000,
     "proxy_policy": "single",
     "sharding": true,
@@ -13,6 +13,16 @@
     "module_list": [{
         "module_name":"ReJSON",
         "module_args": "",
-        "semantic_version": "2.4.3"
+        "semantic_version": "2.6.6"
+    },
+    {
+        "module_name": "search",
+        "module_args": "",
+        "semantic_version": "2.8.8"
+    },
+    {
+        "module_name":"rg",
+        "module_args": "Plugin gears_python CreateVenv 1",
+        "semantic_version": "1.2.7"
     }]
 }

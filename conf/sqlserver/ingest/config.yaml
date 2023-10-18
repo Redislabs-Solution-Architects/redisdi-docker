@@ -2,6 +2,7 @@ connections:
   # Redis target DB connection details
   # This section is for configuring the Redis database to which Redis Data Integration will write the processed data
   target:
+    type: redis
     # Host of the Redis database to which Redis Data Integration will write the processed data
     host: re1
     # Port for the Redis database to which Redis Data Integration will write the processed data

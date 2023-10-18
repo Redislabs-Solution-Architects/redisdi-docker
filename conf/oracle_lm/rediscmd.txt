@@ -1,0 +1,6 @@
+json.set account:1 $ '{"id":1, "firstname": "John", "lastname": "Smith", "address": "123 Smith St", "city":"Columbia", "state":"MO","country":"USA","postalcode":"65202"}'
+
+sqlplus accountdb/Password1@localhost:1521/orclpdb1
+show con_name;
+describe account;
+select * from account;

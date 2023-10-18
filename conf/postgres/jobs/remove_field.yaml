@@ -1,7 +1,0 @@
-source:
-  table: customer
-transform:
-  - uses: remove_field
-    with:
-      fields:
-        - field: fax

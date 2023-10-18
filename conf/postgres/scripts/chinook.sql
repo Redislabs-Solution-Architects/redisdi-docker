@@ -139,6 +139,27 @@ SELECT setval('"public"."track_track_id_seq"', 3503, true);
 /*******************************************************************************
    Create Tables
 ********************************************************************************/
+CREATE TABLE org
+(
+    org_id INT NOT NULL PRIMARY KEY,
+    co_cd VARCHAR(4),
+    org_name VARCHAR(20),
+    email_addr VARCHAR(40),
+    org_user_id INT,
+    first_name VARCHAR(20),
+    last_name VARCHAR(20),
+    rm_attribs_id INT,
+    active VARCHAR(1),
+    in_network VARCHAR(1),
+    org_add_id INT,
+    addr_line1 VARCHAR(40),
+    city VARCHAR(20),
+    postal_cd VARCHAR(10),
+    geo_x NUMERIC(15,12),
+    geo_y NUMERIC(15,12)
+);
+
+
 CREATE TABLE album
 (
     album_id int DEFAULT nextval('album_album_id_seq'::regclass) NOT NULL,
@@ -324,6 +345,9 @@ CREATE INDEX ifk_track_media_type_id ON track (media_type_id);
 /*******************************************************************************
    Populate Tables
 ********************************************************************************/
+INSERT INTO org VALUES(39250, N'X8', N'UM Test User', N'alok.singh@mitchell.com', 392052, N'UM Test', N'User', 276081, N'Y', N'Y', 315137, N'5155 luigi terrace', N'San Diego', N'92122', 32.715736, -117.161087);
+INSERT INTO org VALUES(39251, N'X9', N'Test User2', N'john.smith@mitchell.com', 392053, N'UM Test', N'User', 276082, N'Y', N'Y', 315138, N'123 smith st', N'San Francisco', N'94016', 37.773972, -122.431297);
+
 INSERT INTO genre (genre_id, name) VALUES (1, N'Rock');
 INSERT INTO genre (genre_id, name) VALUES (2, N'Jazz');
 INSERT INTO genre (genre_id, name) VALUES (3, N'Metal');

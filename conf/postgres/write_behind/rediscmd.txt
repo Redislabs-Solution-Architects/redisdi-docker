@@ -1,0 +1,1 @@
+json.set account:1 $ '{"customer_id":1, "first_name": "John", "last_name": "Smith", "address": "123 Smith St", "city":"Columbia", "state":"MO","country":"USA","postal_code":"65202"}'

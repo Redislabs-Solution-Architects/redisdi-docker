@@ -1,8 +1,0 @@
-source:
-  table: album
-transform:
-  - uses: add_field
-    with:
-      field: titlehash
-      language: jmespath
-      expression: hash(title, 'sha256')
