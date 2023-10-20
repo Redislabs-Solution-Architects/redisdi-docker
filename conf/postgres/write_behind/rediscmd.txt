@@ -1,1 +1,23 @@
-json.set account:1 $ '{"customer_id":1, "first_name": "John", "last_name": "Smith", "address": "123 Smith St", "city":"Columbia", "state":"MO","country":"USA","postal_code":"65202"}'
+json.set account:1 $ '{
+    "customer_id":1, 
+    "first_name": "John", 
+    "last_name": "Smith", 
+    "address": "123 Smith St", 
+    "city":"Columbia", 
+    "state":"MO",
+    "country":"USA",
+    "postal_code":"65202", 
+    "cart": [
+        {
+            "id": "9e89cb44", 
+            "name": "shoe", 
+            "price": 49.99
+        },
+        {
+            "id": "d4352198",
+            "name": "shirt",
+            "price": 35.99
+        } 
+    ]}'
+
+./redis-di status --rdi-host localhost --rdi-port 12000 --rdi-password redis

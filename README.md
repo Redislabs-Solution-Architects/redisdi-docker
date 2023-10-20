@@ -28,6 +28,7 @@ git clone https://github.com/Redislabs-Solution-Architects/redisdi-docker.git &&
 ## Usage <a name="usage"></a>
 ### Options
 - <dbtype>  postgres, mysql, sqlserver, oracle_lm (LogMiner), oracle_xs (XStreams) currently supported.
+- <mode> ingress, writebehind
 
 ### Execution Example
 ```bash
@@ -38,4 +39,7 @@ git clone https://github.com/Redislabs-Solution-Architects/redisdi-docker.git &&
 ```
 
 ## Architecture <a name="architecture"></a>
-![architecture](https://docs.google.com/drawings/d/e/2PACX-1vTTMI3fiiboZdx5zhYUEQF22Wrw4O-xGHhnbYa0_8h_PWInpYsy0bBIDS2bDNis3ceYUHBpJ6MWQAXo/pub?w=663&h=380)  
+### Ingress
+![architecture](https://docs.google.com/drawings/d/e/2PACX-1vQJTilci_8FrRnPjy7Lxf67QLiUbilbLpmM3ftsKIY0jYJOi7uqupLs1XXGFRKP4yq0S7plyNYiUVwA/pub?w=663&h=380) 
+### Writebehind
+![architecture](https://docs.google.com/drawings/d/e/2PACX-1vTTMI3fiiboZdx5zhYUEQF22Wrw4O-xGHhnbYa0_8h_PWInpYsy0bBIDS2bDNis3ceYUHBpJ6MWQAXo/pub?w=663&h=380) 

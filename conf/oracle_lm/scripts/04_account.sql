@@ -17,15 +17,25 @@ CONNECT accountdb/Password1@orclpdb1;
 
 CREATE TABLE account
 (
-    id INT NOT NULL,
-    firstname VARCHAR2(40) NOT NULL,
-    lastname VARCHAR2(20) NOT NULL,
+    customerid INT NOT NULL,
+    fname VARCHAR2(40) NOT NULL,
+    lname VARCHAR2(20) NOT NULL,
     address VARCHAR2(70),
     city VARCHAR2(40),
     state VARCHAR2(40),
     country VARCHAR2(40),
     postalcode VARCHAR2(10),
-    PRIMARY KEY  (id)
+    PRIMARY KEY  (customerid)
 );
+
+CREATE TABLE cartitems 
+(
+    itemid VARCHAR2(8) NOT NULL, 
+    customerid INT NOT NULL, 
+    name VARCHAR2(40) NOT NULL, 
+    price NUMERIC(10,2) NOT NULL, 
+    PRIMARY KEY (itemid)
+);
+
 commit;
 exit;

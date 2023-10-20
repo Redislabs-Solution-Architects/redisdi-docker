@@ -3,6 +3,17 @@ source:
     key_pattern: account:*
     trigger: write-behind
     exclude_commands: ["json.del"]
+
+transform:
+  - uses: rename_field
+    with:
+      from_field: firstname
+      to_field: fname
+  - uses: rename_field
+    with:
+      from_field: lastname
+      to_field: lname
+
 output:
   - uses: relational.write
     with:
@@ -10,12 +21,25 @@ output:
       schema: accountdb
       table: account
       keys:
-        - id
+        - customerid
       mapping:
-        - firstname
-        - lastname
+        - fname
+        - lname
         - address
         - city
         - state
         - country
         - postalcode
+
+  - uses: relational.write
+    with:
+      connection: my-oracle
+      schema: accountdb
+      table: cartitems
+      foreach: "item: cart[]"
+      keys:
+        - itemid: item.id
+      mapping:
+        - customerid
+        - name: item.name
+        - price: item.price

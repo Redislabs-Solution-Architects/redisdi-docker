@@ -9,6 +9,7 @@ JSON=rejson.Linux-ubuntu18.04-x86_64.2.6.6.zip
 SEARCH=redisearch.Linux-ubuntu18.04-x86_64.2.8.8.zip
 INSTANT_CLIENT=https://download.oracle.com/otn_software/linux/instantclient/219000/instantclient-basiclite-linux.x64-21.9.0.0.0dbru.zip
 SOURCE_DB=
+MODE=
 
 gears_check() {
     while [ -z "$(curl -s -k -u "redis@redis.com:redis" https://localhost:9443/v1/modules | \
@@ -75,6 +76,16 @@ case $1 in
         ;;
 esac
 
+case $2 in
+    ingress|writebehind) 
+        MODE=$2
+        ;;
+    *)  
+        echo "Usage: run.sh <mode: ingress|writebehind>" 1>&2
+        exit 1
+        ;;
+esac
+
 if [ ! -f $JSON ]
 then
     echo "*** Fetch JSON module  ***"
@@ -121,19 +132,22 @@ gears_check
 echo "*** Build Target Redis DB ***"
 curl -s -o /dev/null -k -u "redis@redis.com:redis" https://localhost:9443/v1/bdbs -H "Content-Type:application/json" -d @targetdb.json
 
-echo "*** Build Redis DI DB for CDC ***"
-./redis-di create --silent --cluster-host localhost --cluster-api-port 9443 --cluster-user redis@redis.com \
---cluster-password redis --rdi-port 13000 --rdi-password redis
-
-echo "*** Deploy Redis DI for CDC ***"
-./redis-di deploy --dir ./conf/$SOURCE_DB/ingest --rdi-host localhost --rdi-port 13000 --rdi-password redis
-
 echo "*** Wait for Source DB to come up ***"
 db_check
 
-echo "*** Configure and Deploy Redis DI for Write-behind ***"
-./redis-di configure --rdi-host localhost --rdi-port 12000 --rdi-password redis
-./redis-di deploy --rdi-host localhost --rdi-port 12000 --rdi-password redis --dir ./conf/$SOURCE_DB/write_behind
+if [ $MODE == "ingress" ]
+then
+    echo "*** Build Redis DI DB for Ingress ***"
+    ./redis-di create --silent --cluster-host localhost --cluster-api-port 9443 --cluster-user redis@redis.com \
+    --cluster-password redis --rdi-port 13000 --rdi-password redis
 
-echo "*** Start Debezium ***"
-SOURCE_DB=$SOURCE_DB INSTANT_CLIENT=$INSTANT_CLIENT docker compose --profile debezium up -d
+    echo "*** Deploy Redis DI for Ingress ***"
+    ./redis-di deploy --dir ./conf/$SOURCE_DB/ingest --rdi-host localhost --rdi-port 13000 --rdi-password redis
+    
+    echo "*** Start Debezium ***"
+    SOURCE_DB=$SOURCE_DB INSTANT_CLIENT=$INSTANT_CLIENT docker compose --profile debezium up -d
+else
+    echo "*** Configure and Deploy Redis DI for Write-behind ***"
+    ./redis-di configure --rdi-host localhost --rdi-port 12000 --rdi-password redis
+    ./redis-di deploy --rdi-host localhost --rdi-port 12000 --rdi-password redis --dir ./conf/$SOURCE_DB/write_behind
+fi

@@ -1,6 +1,29 @@
-json.set account:1 $ '{"id":1, "firstname": "John", "lastname": "Smith", "address": "123 Smith St", "city":"Columbia", "state":"MO","country":"USA","postalcode":"65202"}'
+json.set account:1 $ '{
+    "customerid":1, 
+    "firstname": "John", 
+    "lastname": "Smith", 
+    "address": "123 Smith St", 
+    "city":"Columbia", 
+    "state":"MO",
+    "country":"USA",
+    "postalcode":"65202",
+    "cart": [
+        {
+            "id": "9e89cb44", 
+            "name": "shoe", 
+            "price": 49.99
+        },
+        {
+            "id": "d4352198",
+            "name": "shirt",
+            "price": 35.99
+        } 
+    ]}'
 
 sqlplus accountdb/Password1@localhost:1521/orclpdb1
 show con_name;
 describe account;
 select * from account;
+select * from cartitems;
+
+./redis-di status --rdi-host localhost --rdi-port 12000 --rdi-password redis
