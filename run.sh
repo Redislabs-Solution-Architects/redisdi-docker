@@ -5,19 +5,9 @@
 # builds a source DB, builds a Redis DI sink DB, deploys Redis DI, starts a Debezium container
 
 GEARS=redisgears_python.Linux-ubuntu18.04-x86_64.1.2.7.zip
-JSON=rejson.Linux-ubuntu18.04-x86_64.2.6.6.zip
-SEARCH=redisearch.Linux-ubuntu18.04-x86_64.2.8.8.zip
 INSTANT_CLIENT=https://download.oracle.com/otn_software/linux/instantclient/219000/instantclient-basiclite-linux.x64-21.9.0.0.0dbru.zip
 SOURCE_DB=
 MODE=
-
-gears_check() {
-    while [ -z "$(curl -s -k -u "redis@redis.com:redis" https://localhost:9443/v1/modules | \
-    jq '.[] | select(.display_name=="RedisGears").semantic_version')" ]
-    do  
-        sleep 3
-    done
-}
 
 db_check() {
     case $SOURCE_DB in
@@ -86,18 +76,6 @@ case $2 in
         ;;
 esac
 
-if [ ! -f $JSON ]
-then
-    echo "*** Fetch JSON module  ***"
-    wget -q https://redismodules.s3.amazonaws.com/rejson/$JSON
-fi 
-
-if [ ! -f $SEARCH ]
-then
-    echo "*** Fetch SEARCH module  ***"
-    wget -q https://redismodules.s3.amazonaws.com/redisearch/$SEARCH
-fi 
-
 if [ ! -f $GEARS ]
 then
     echo "*** Fetch Gears  ***"
@@ -123,14 +101,13 @@ docker exec -it re3 /opt/redislabs/bin/rladmin cluster join nodes 192.168.20.2 u
 
 echo "*** Load Modules ***"
 curl -s -o /dev/null -k -u "redis@redis.com:redis" https://localhost:9443/v2/modules -F module=@$GEARS
-curl -s -o /dev/null -k -u "redis@redis.com:redis" https://localhost:9443/v1/modules -F module=@$JSON
-curl -s -o /dev/null -k -u "redis@redis.com:redis" https://localhost:9443/v1/modules -F module=@$SEARCH
 
 echo "*** Wait for Gears Module to load ***"
-gears_check
+sleep 30
 
 echo "*** Build Target Redis DB ***"
 curl -s -o /dev/null -k -u "redis@redis.com:redis" https://localhost:9443/v1/bdbs -H "Content-Type:application/json" -d @targetdb.json
+sleep 1
 
 echo "*** Wait for Source DB to come up ***"
 db_check
