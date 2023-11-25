@@ -32,7 +32,7 @@ db_check() {
         docker exec mysql mysql --user=root --password=debezium --silent \
         -e "GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'mysqluser';" >/dev/null 2>&1
         docker exec mysql /bin/bash -c "mysql --user=mysqluser --password=mysqlpw Chinook < /home/scripts/chinook.sql" >/dev/null 2>&1
-        docker exec mysql /bin/bash -c "mysql --user=root --password=debezium < /home/scripts/account.sql"
+        docker exec mysql /bin/bash -c "mysql --user=root --password=debezium < /home/scripts/account.sql" >/dev/null 2>&1
         ;;
         sqlserver)
         while ! docker exec sqlserver cat /var/opt/mssql/log/errorlog | \
@@ -102,15 +102,15 @@ docker exec -it re3 /opt/redislabs/bin/rladmin cluster join nodes 192.168.20.2 u
 echo "*** Load Modules ***"
 curl -s -o /dev/null -k -u "redis@redis.com:redis" https://localhost:9443/v2/modules -F module=@$GEARS
 
+echo "*** Wait for Source DB to come up ***"
+db_check
+
 echo "*** Wait for Gears Module to load ***"
-sleep 30
+sleep 60
 
 echo "*** Build Target Redis DB ***"
 curl -s -o /dev/null -k -u "redis@redis.com:redis" https://localhost:9443/v1/bdbs -H "Content-Type:application/json" -d @targetdb.json
 sleep 1
-
-echo "*** Wait for Source DB to come up ***"
-db_check
 
 if [ $MODE == "ingress" ]
 then

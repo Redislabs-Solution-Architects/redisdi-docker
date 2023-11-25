@@ -18,7 +18,7 @@ This is a utility script for building a full Redis DI environment in Docker
 ## Prerequisites <a name="prerequisites"></a>
 - Ubuntu 20.x or higher
 - Docker
-- Command line tools: curl, wget, jq, select
+- Command line tools: curl, wget
 
 ## Installation <a name="installation"></a>
 ```bash

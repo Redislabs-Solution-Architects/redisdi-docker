@@ -68,7 +68,6 @@ services:
     ports:
      - 3306:3306
     volumes:
-      - $PWD/conf/mysql/conf.d:/etc/mysql/conf.d
       - $PWD/conf/mysql/scripts:/home/scripts
     environment:
      - MYSQL_ROOT_PASSWORD=debezium
