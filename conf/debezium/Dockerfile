@@ -1,4 +1,4 @@
-FROM debezium/server:latest
+FROM quay.io/debezium/server:latest
 USER root
 ARG INSTANT_CLIENT
 RUN microdnf -y install libaio && \
