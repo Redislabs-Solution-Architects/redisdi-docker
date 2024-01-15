@@ -16,6 +16,7 @@ db_check() {
         do  
             sleep 3
         done
+        sleep 30
         echo "*** Postgres is up ***"
         docker exec postgres /bin/bash -c "export PGPASSWORD=postgres"
         docker exec postgres createdb -U postgres Chinook
@@ -92,7 +93,7 @@ echo "*** Launch Redis Enterprise + Source DB Containers ***"
 SOURCE_DB=$SOURCE_DB INSTANT_CLIENT=$INSTANT_CLIENT docker compose --profile $SOURCE_DB up -d
 
 echo "*** Wait for Redis Enterprise to come up ***"
-curl -s -o /dev/null --retry 5 --retry-all-errors --retry-delay 3 -f -k -u "redis@redis.com:redis" https://localhost:9443/v1/bootstrap
+curl -s -o /dev/null --retry 5 --retry-all-errors --retry-delay 3 -f -k -u "redis@redis.com:redis" https://192.168.20.2:9443/v1/bootstrap
 
 echo "*** Build Cluster ***"
 docker exec -it re1 /opt/redislabs/bin/rladmin cluster create name cluster.local username redis@redis.com password redis
@@ -100,7 +101,7 @@ docker exec -it re2 /opt/redislabs/bin/rladmin cluster join nodes 192.168.20.2 u
 docker exec -it re3 /opt/redislabs/bin/rladmin cluster join nodes 192.168.20.2 username redis@redis.com password redis
 
 echo "*** Load Modules ***"
-curl -s -o /dev/null -k -u "redis@redis.com:redis" https://localhost:9443/v2/modules -F module=@$GEARS
+curl -s -o /dev/null -k -u "redis@redis.com:redis" https://192.168.20.2:9443/v2/modules -F module=@$GEARS
 
 echo "*** Wait for Source DB to come up ***"
 db_check
@@ -109,22 +110,31 @@ echo "*** Wait for Gears Module to load ***"
 sleep 60
 
 echo "*** Build Target Redis DB ***"
-curl -s -o /dev/null -k -u "redis@redis.com:redis" https://localhost:9443/v1/bdbs -H "Content-Type:application/json" -d @targetdb.json
+curl -s -o /dev/null -k -u "redis@redis.com:redis" https://192.168.20.2:9443/v1/bdbs -H "Content-Type:application/json" -d @targetdb.json
 sleep 1
 
 if [ $MODE == "ingress" ]
 then
     echo "*** Build Redis DI DB for Ingress ***"
-    ./redis-di create --silent --cluster-host localhost --cluster-api-port 9443 --cluster-user redis@redis.com \
+    ./redis-di create --silent --cluster-host 192.168.20.2 --cluster-api-port 9443 --cluster-user redis@redis.com \
     --cluster-password redis --rdi-port 13000 --rdi-password redis
 
     echo "*** Deploy Redis DI for Ingress ***"
-    ./redis-di deploy --dir ./conf/$SOURCE_DB/ingest --rdi-host localhost --rdi-port 13000 --rdi-password redis
+    ./redis-di deploy --dir ./conf/$SOURCE_DB/ingest --rdi-host 192.168.20.3 --rdi-port 13000 --rdi-password redis
     
     echo "*** Start Debezium ***"
     SOURCE_DB=$SOURCE_DB INSTANT_CLIENT=$INSTANT_CLIENT docker compose --profile debezium up -d
+
+    echo "*** Start Redis DI Monitor ***"
+    ./redis-di monitor --rdi-host 192.168.20.3 --rdi-port 13000 --rdi-password redis &
 else
     echo "*** Configure and Deploy Redis DI for Write-behind ***"
-    ./redis-di configure --rdi-host localhost --rdi-port 12000 --rdi-password redis
-    ./redis-di deploy --rdi-host localhost --rdi-port 12000 --rdi-password redis --dir ./conf/$SOURCE_DB/write_behind
+    ./redis-di configure --rdi-host 192.168.20.2 --rdi-port 12000 --rdi-password redis
+    ./redis-di deploy --rdi-host 192.168.20.2 --rdi-port 12000 --rdi-password redis --dir ./conf/$SOURCE_DB/write_behind
+
+    echo "*** Start Redis DI Monitor ***"
+    ./redis-di monitor --rdi-host 192.168.20.2 --rdi-port 12000 --rdi-password redis &
 fi
+
+echo "*** Start Prometheus + Grafana ***"
+SOURCE_DB=$SOURCE_DB INSTANT_CLIENT=$INSTANT_CLIENT docker compose --profile prometheus up -d
