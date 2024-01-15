@@ -18,7 +18,8 @@ This is a utility script for building a full Redis DI environment in Docker
 ## Prerequisites <a name="prerequisites"></a>
 - Ubuntu 20.x or higher
 - Docker
-- Command line tools: curl, wget
+- Docker compose
+- Command line tools: curl, wget, pkill
 
 ## Installation <a name="installation"></a>
 ```bash
@@ -32,7 +33,7 @@ git clone https://github.com/Redislabs-Solution-Architects/redisdi-docker.git &&
 
 ### Execution Example
 ```bash
-./run.sh mysql
+./start.sh mysql ingress
 ```
 ```bash
 ./stop.sh mysql

@@ -15,4 +15,5 @@ case $1 in
         ;;
 esac
 
-SOURCE_DB=$SOURCE_DB INSTANT_CLIENT=$INSTANT_CLIENT docker compose --profile $SOURCE_DB --profile debezium down
+SOURCE_DB=$SOURCE_DB INSTANT_CLIENT=$INSTANT_CLIENT docker compose --profile $SOURCE_DB --profile debezium --profile prometheus down
+pkill redis-di

@@ -20,4 +20,7 @@ json.set account:1 $ '{
         } 
     ]}'
 
-./redis-di status --rdi-host localhost --rdi-port 12000 --rdi-password redis
+./redis-di status --rdi-host 192.168.20.2 --rdi-port 12000 --rdi-password redis
+
+docker exec -it postgres psql -q AccountDB -U postgres
+select * from account;

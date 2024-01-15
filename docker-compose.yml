@@ -9,9 +9,10 @@ services:
     cap_add: 
       - sys_resource
     ports:
-      - "12000:12000"
-      - "8443:8443"
-      - "9443:9443"
+      - 12000
+      - 8443
+      - 9443
+      - 8070
     profiles: ["mysql", "postgres", "sqlserver", "oracle_lm", "oracle_xs"]
     networks:
       re_cluster:
@@ -26,7 +27,7 @@ services:
     cap_add: 
       - sys_resource
     ports:
-      - "13000:13000"
+      - 13000
     profiles: ["mysql", "postgres", "sqlserver", "oracle_lm", "oracle_xs"]
     networks:
       re_cluster:
@@ -52,21 +53,28 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - 5432
+    depends_on:
+      - re1
+      - re2
+      - re3
     volumes:
       - $PWD/conf/postgres/scripts:/home/scripts
     command: [ "postgres", "-c", "wal_level=logical" ]
     profiles: ["postgres"]
     networks:
-      re_cluster:
-        ipv4_address: 192.168.20.5
+      - re_cluster
   
   mysql:
     image: mysql:latest
     restart: on-failure
     container_name: mysql
     ports:
-     - 3306:3306
+     - 3306
+    depends_on:
+      - re1
+      - re2
+      - re3
     volumes:
       - $PWD/conf/mysql/scripts:/home/scripts
     environment:
@@ -76,14 +84,17 @@ services:
      - MYSQL_PASSWORD=mysqlpw
     profiles: ["mysql"]
     networks:
-      re_cluster:
-        ipv4_address: 192.168.20.6
+      - re_cluster
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver
     ports:
-     - 1433:1433
+     - 1433
+    depends_on:
+      - re1
+      - re2
+      - re3
     environment:
      - ACCEPT_EULA=Y
      - MSSQL_PID=Standard
@@ -93,14 +104,17 @@ services:
       - $PWD/conf/sqlserver/scripts:/home/scripts
     profiles: ["sqlserver"]
     networks:
-      re_cluster:
-        ipv4_address: 192.168.20.7
+      - re_cluster
 
   oracle_lm:
     image: container-registry.oracle.com/database/enterprise:latest
     container_name: oracle_lm
     ports:
-     - 1521:1521
+     - 1521
+    depends_on:
+      - re1
+      - re2
+      - re3
     environment:
      - ORACLE_SID=ORCLCDB 
      - ORACLE_EDITION=enterprise
@@ -111,14 +125,17 @@ services:
       - $PWD/conf/oracle_lm/scripts:/opt/oracle/scripts/startup
     profiles: ["oracle_lm"]
     networks:
-      re_cluster:
-        ipv4_address: 192.168.20.8
+      - re_cluster
 
   oracle_xs:
     image: container-registry.oracle.com/database/enterprise:latest
     container_name: oracle_xs
     ports:
-     - 1521:1521
+     - 1521
+    depends_on:
+      - re1
+      - re2
+      - re3
     environment:
      - ORACLE_SID=ORCLCDB 
      - ORACLE_EDITION=enterprise
@@ -129,8 +146,7 @@ services:
       - $PWD/conf/oracle_xs/scripts:/opt/oracle/scripts/startup
     profiles: ["oracle_xs"]
     networks:
-      re_cluster:
-        ipv4_address: 192.168.20.9
+      - re_cluster
 
   debezium:
     build: 
@@ -142,8 +158,31 @@ services:
       - $PWD/conf/$SOURCE_DB/application.properties:/debezium/conf/application.properties
     profiles: ["debezium"]
     networks:
-      re_cluster:
-        ipv4_address: 192.168.20.20
+      - re_cluster
+
+  prometheus-server:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    profiles: ["prometheus"]
+    volumes:
+      - $PWD/conf/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - re_cluster
+
+  grafana-ui:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    profiles: ["prometheus"]
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=secret
+    links:
+      - prometheus-server:prometheus
+    networks:
+      - re_cluster
 
 #Docker Networks
 networks:
@@ -153,4 +192,4 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 192.168.20.0/24
+        - subnet: 192.168.20.0/24          
