@@ -68,11 +68,11 @@ case $1 in
 esac
 
 case $2 in
-    ingress|writebehind) 
+    ingest|writebehind) 
         MODE=$2
         ;;
     *)  
-        echo "Usage: run.sh <mode: ingress|writebehind>" 1>&2
+        echo "Usage: run.sh <mode: ingest|writebehind>" 1>&2
         exit 1
         ;;
 esac
@@ -113,7 +113,7 @@ echo "*** Build Target Redis DB ***"
 curl -s -o /dev/null -k -u "redis@redis.com:redis" https://192.168.20.2:9443/v1/bdbs -H "Content-Type:application/json" -d @targetdb.json
 sleep 1
 
-if [ $MODE == "ingress" ]
+if [ $MODE == "ingest" ]
 then
     echo "*** Build Redis DI DB for Ingress ***"
     ./redis-di create --silent --cluster-host 192.168.20.2 --cluster-api-port 9443 --cluster-user redis@redis.com \

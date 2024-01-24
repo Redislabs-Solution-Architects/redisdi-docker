@@ -29,11 +29,11 @@ git clone https://github.com/Redislabs-Solution-Architects/redisdi-docker.git &&
 ## Usage <a name="usage"></a>
 ### Options
 - <dbtype>  postgres, mysql, sqlserver, oracle_lm (LogMiner), oracle_xs (XStreams) currently supported.
-- <mode> ingress, writebehind
+- <mode> ingest, writebehind
 
 ### Execution Example
 ```bash
-./start.sh mysql ingress
+./start.sh mysql ingest
 ```
 ```bash
 ./stop.sh mysql
