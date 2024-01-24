@@ -35,6 +35,11 @@ Go
 
 13. Show CDC delete in Redis with RedisInsight.
 
+14. Search - Which countries generated the most invoices?
+FT.CREATE idx ON JSON PREFIX 1 invoice:InvoiceId SCHEMA $.BillingCountry AS BillingCountry TAG
+FT.AGGREGATE idx * GROUPBY 1 @BillingCountry REDUCE COUNT 0 AS Invoices SORTBY 2 @Invoices DESC LIMIT 0 5
+
+
 
 Write-behind Demo
 
